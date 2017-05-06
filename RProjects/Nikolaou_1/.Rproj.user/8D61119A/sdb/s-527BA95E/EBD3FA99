@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "##################################################################\n####    Master in Bioinformatics                              ####\n####    BC203 Introduction to R for Bioinformatics            ####\n####    Vangelis Theodorakis @ med1p112005@med.uoc.gr         ####\n####    Written using extensive googling, material from       ####\n####    both the BC203 Introduction to R for Bioinformatics   ####\n####    and BIO315 Computational Biology                      ####\n####                                                          ####\n####    PS. All the major workload was done while crying in   ####\n####    despair. The reason is that the assingment was not    ####\n####    quite descriptive in terms of steps and methodology   ####\n####    so it was more or less a black box for me.             ####\n##################################################################\n\n# Read the datasets and the one with the profiles\n\ndata<-read.delim(\"/home/theodor/Master/BC203 Introduction to R for Bioinformatics/BC203_Exercise_general.tsv\",header=T,sep=\"\\t\")\nprofiles<-read.delim(\"/home/theodor/Master/BC203 Introduction to R for Bioinformatics/BC203_Exercise_test.tsv\",header=T,sep=\"\\t\")\n\n# Concatenate the samples with the profile\ndata<-cbind(data,Profile2=profiles$Profile2)\n\n# Now that they are concatenated normalize them withe the following formula : x-mean/s^2\ndataNormalized<-as.data.frame(scale(data[,2:ncol(data)],center = TRUE, scale = TRUE))\n\n# Categorize my data per column name so later is easier to manipulate\nwt_headers<-grep(\"WT\",colnames(data))\ntg_headers<-grep(\"Tg\",colnames(data))\n\nx_headers<-grep(\"X\",colnames(data))\ny_headers<-grep(\"Y\",colnames(data))\nz_headers<-grep(\"Z\",colnames(data))\nk_headers<-grep(\"K\",colnames(data))\nl_headers<-grep(\"L\",colnames(data))\nm_headers<-grep(\"M\",colnames(data))\n\n# Now take the means of the rows in healthy and transgenic samples to generate one column \"samples\"\nwt<-rowMeans(dataNormalized[,wt_headers])\ntg<-rowMeans(dataNormalized[,tg_headers])\n\nx<-rowMeans(dataNormalized[,x_headers])\ny<-rowMeans(dataNormalized[,y_headers])\nz<-rowMeans(dataNormalized[,z_headers])\nk<-rowMeans(dataNormalized[,k_headers])\nl<-rowMeans(dataNormalized[,l_headers])\nm<-rowMeans(dataNormalized[,m_headers])\n\n# Now i want to remove the noise. A good approach is to take their logarithm and see if there are changes in the genes\n# between wild type and transgenic samples. I do this taking a statistical significance in regard of the difference.\nlog2(tg/wt)*10->logFC_Tg\npval_Tg<-vector(mode=\"numeric\", length=length(dataNormalized[,1]))\nfor(i in 1:length(dataNormalized[,1])){pval_Tg[i]<-t.test(dataNormalized[i,wt_headers], dataNormalized[i,tg_headers])$p.value}\nwhich((logFC_Tg > 1 | logFC_Tg < -1) & pval_Tg<=0.05)->changed_genes\n\n# Hold only the changed gene expressions for the treatments\ntreatments<-data.frame(x,y,z,k,l,m)[changed_genes,]\n\n# Respectively for my profile\nprofile<-data.frame(Profile=dataNormalized$Profile2)\nprofile<-profile[changed_genes,]\n\n# Now merge all the data in a dataframe\ncleared_data<-data.frame(x,y,z,k,l,m,Profile=dataNormalized$Profile2)[changed_genes,]\n\n# Correlation test gives the Y as the correct treatment\ncorrelations = cor(treatments,profile)\n\n# PCA and KMeans also gives the Y as the right treatment\npc<-princomp(cleared_data)\n\nfit<-cbind(pc$loadings[,1])\n\n# I want 2 clusters. The one that fits my profile and the others\ncluster_test<-kmeans(fit,2,iter.max = 1000)\n\ncluster_test$cluster\n\nplot(fit, col =(cluster_test$cluster +1) , main=\"K-Means result with 2 clusters\")\n\n\n# According to Hierarchical clustering my profile fits Y ?\n\ndistances<-dist(t(cleared_data),method = \"euclidean\")\n\nclusters<-hclust(distances,method = \"centroid\")\n\nplot(clusters,hang = -1)\n\n\n",
+    "created" : 1493302786657.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2044700233",
+    "id" : "EBD3FA99",
+    "lastKnownWriteTime" : 1493498381,
+    "last_content_update" : 1493498381940,
+    "path" : "~/Nikolaou_1/gene_profile_finder.R",
+    "project_path" : "gene_profile_finder.R",
+    "properties" : {
+        "notebook_format" : "html_document",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
