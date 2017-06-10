@@ -77,16 +77,13 @@ for(i in 1:length(characteristics_vec2)){
 }
 characteristics_vec2
 
-#toKeep <- apply(count_data, 1, sum) > 50 * dim(count_data)[2];
-#count_data <- count_data[toKeep, ];
-#dim(count_data)
+toKeep <- apply(count_data, 1, sum) > 50 * dim(count_data)[2];
+count_data <- count_data[toKeep, ];
+dim(count_data)
 
 
 #my_dataset<-count_data
 #my_dataset <- rbind(my_dataset,'condition'=characteristics_vec2)
-
-
-factor(chang03$disease.state))
 
 #object for edgeR
 dgList <- DGEList(counts=count_data, genes=rownames(count_data))
@@ -95,16 +92,15 @@ dgList <- DGEList(counts=count_data, genes=rownames(count_data))
 designMatrix <- model.matrix(~ characteristics_vec2 )
 
 #estimating dispersion
-edgeRObject <- estimateDisp(y = edgeRObject, design = designMatrix)
-
-edgeRFit <- glmFit(edgeRObject, designMatrix)
+dgList <- estimateGLMCommonDisp(dgList, design=designMatrix)
+edgeRFit <- glmFit(dgList, designMatrix)
 
 #testing for disease.status
 diseaseGenes <- glmLRT(edgeRFit, coef = 1)
 
 #top differentially expressed genes
 diseaseGenes <- topTags(diseaseGenes, n = dim(count_data)[1], p.value = 1)@.Data[[1]]
-tail(diseaseGenes)
+head(diseaseGenes)
 
 #grammi 67 me grammi 76 mallon den xreiazontai giati to characteristics_vec2 periexei to phenotype
 # Extract the sample characteristics
