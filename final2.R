@@ -5,29 +5,29 @@
 #alla den einai me tin idia seira kai den exoun to idio mege8os
 #3ekiniste na bazete tis biblio8ikes toulaxiston giati emena se linux gamiotan kai ekei to simpan
 
-install.packages("codetools")
-install.packages("doRNG")
+#Define a function for loading packages
 
-#installing recount
-if(!require('recount', quietly = TRUE)){
-  #note: use 'http' if 'https' is not supported
-  source(file = "http://bioconductor.org/biocLite.R")
-  biocLite("recount", dependencies=TRUE)
-  library("recount")
+load_ = function(pkg, bioC=T) {
+
+	#character.only has to be set to True in order for require() or library() to realize it's dealing with a variable
+
+	if(!require(pkg, character.only=T, quietly = T)) {
+		if(bioC){
+			source(file = "http://bioconductor.org/biocLite.R")
+			biocLite(package, dependencies=T)
+		} else {
+			install.packages(pkg)
+		}
+	}
+
+	library(pkg, character.only=T)
 }
 
-#installation
-if(!require('DESeq2', quietly = TRUE)){
-  source("https://bioconductor.org/biocLite.R")
-  biocLite("DESeq2")  
-  library('DESeq2', quietly = TRUE)
-}
-
-if(!require('edgeR', quietly = TRUE)){
-  source("https://bioconductor.org/biocLite.R")
-  biocLite("edgeR")  
-  library('edgeR', quietly = TRUE)
-}
+load_("codetools", bioC=F)
+load_("doRNG", bioC=F)
+load_("recount")
+load_("DESeq2")
+load_("edgeR")
 
 #epeidi o lagani gamietai kai prepei na paroume ta xaraktiristika apo allou
 my_data<-read.table("/home/antonios/Dropbox/code_base/203/SraRunTable.txt",header = TRUE,sep="\t")
