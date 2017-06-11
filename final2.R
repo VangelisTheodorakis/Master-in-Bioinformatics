@@ -8,9 +8,7 @@
 #Define a function for loading packages
 
 load_ = function(pkg, bioC=T) {
-
 	#character.only has to be set to True in order for require() or library() to realize it's dealing with a variable
-
 	if(!require(pkg, character.only=T, quietly = T)) {
 		if(bioC){
 			source(file = "http://bioconductor.org/biocLite.R")
@@ -19,7 +17,6 @@ load_ = function(pkg, bioC=T) {
 			install.packages(pkg)
 		}
 	}
-
 	library(pkg, character.only=T)
 }
 
