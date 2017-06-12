@@ -12,7 +12,7 @@ load_ = function(pkg, bioC=T) {
 	if(!require(pkg, character.only=T, quietly = T)) {
 		if(bioC){
 			source(file = "http://bioconductor.org/biocLite.R")
-			biocLite(package, dependencies=T)
+			biocLite(pkg, dependencies=T)
 		} else {
 			install.packages(pkg)
 		}
